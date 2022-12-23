@@ -1,12 +1,14 @@
 package com.xing.connectors;
 
 import com.amazonaws.services.kinesis.model.Record;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.UnsupportedEncodingException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Schema.Type;
 import org.apache.kafka.connect.data.Struct;
@@ -112,16 +114,20 @@ public class RecordConverter {
         return ByteBuffer.wrap(new byte[0]);
 
       case STRUCT:
-        List<ByteBuffer> fieldList = new LinkedList<>();
-        // parse each field of the struct
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode record = mapper.createObjectNode();
         schema.fields().forEach(
-            field -> fieldList.add(parseValue(field.schema(), ((Struct) value).get(field))));
-        // Init bytebuffer
-        ByteBuffer processedValue = ByteBuffer.allocate(
-            fieldList.stream().mapToInt(Buffer::remaining).sum());
-        // But from fieldList into buffer
-        fieldList.forEach(buffer -> processedValue.put(buffer.duplicate()));
-        return processedValue;
+            field -> {
+              record.put(field.name(), ((Struct) value).get(field).toString());
+            }
+        );
+        try {
+          String json = mapper.writeValueAsString(record);
+          return ByteBuffer.wrap(json.getBytes(StandardCharsets.UTF_8));
+        } catch (JsonProcessingException e) {
+          throw new DataException("Failed with: " + e.getLocalizedMessage());
+        }
+
     }
 
     return null;

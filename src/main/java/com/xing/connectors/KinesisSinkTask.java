@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -257,6 +258,16 @@ public class KinesisSinkTask extends SinkTask {
       boolean usePartitionAsHashKey, SinkRecord record) {
     // We can use the Kafka Partition as the partition key for Kinesis
     // same partition -> same shard
+    // LOG
+    logger.info("Received record: " + record.toString());
+    logger.info("Received record value: " + record.value().toString());
+    logger.info("Received record value schema: " + record.valueSchema().toString());
+    logger.info("Received record value schema (object): " + record.valueSchema());
+    logger.info(
+        "Record parsed as: " + StandardCharsets.UTF_8.decode(
+            RecordConverter.parseValue(record.valueSchema(), record.value()))
+    );
+    // END LOG
     if (usePartitionAsHashKey) {
       return kp.addUserRecord(streamName, partitionKey, Integer.toString(record.kafkaPartition()),
           RecordConverter.parseValue(record.valueSchema(), record.value()));

@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -110,6 +112,32 @@ public class TestRecordConverter {
     assertEquals(left, right);
   }
 
+  @Test
+  @DisplayName("Struct Test")
+  public void convertStructTest() {
+    String expected = "{\"education_id\":\"201\",\"profile_id\":\"2\",\"school_name\":\"SRM\","
+        + "\"degree\":\"EEE\",\"dt\":\"2022-12-20\",\"_hoodie_is_deleted\":\"false\"}";
 
+    Schema schema = SchemaBuilder.struct()
+        .field("education_id", Schema.INT32_SCHEMA)
+        .field("profile_id", Schema.INT32_SCHEMA)
+        .field("school_name", Schema.STRING_SCHEMA)
+        .field("degree", Schema.STRING_SCHEMA)
+        .field("dt", Schema.STRING_SCHEMA)
+        .field("_hoodie_is_deleted", Schema.BOOLEAN_SCHEMA)
+        .build();
+
+    Struct value = new Struct(schema);
+    value.put("education_id", 201);
+    value.put("profile_id", 2);
+    value.put("school_name", "SRM");
+    value.put("degree", "EEE");
+    value.put("dt", "2022-12-20");
+    value.put("_hoodie_is_deleted", false);
+
+    ByteBuffer record = RecordConverter.parseValue(schema, value);
+    String recordString = String.valueOf(StandardCharsets.UTF_8.decode(record));
+    assertEquals(recordString, expected);
+  }
 }
 
