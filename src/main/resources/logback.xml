@@ -1,0 +1,23 @@
+<configuration scan="false">
+  <property name="APP_NAME" value="hudi-avroKeys-test"/>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>[%date] [%level] [%logger] in %thread %n%message%n%xException%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.xing" level="DEBUG">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <logger name="org.apache.kafka" level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <logger name="com.amazonaws" level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <root level="${ROOT_LOG_LEVEL:-INFO}"/>
+</configuration>

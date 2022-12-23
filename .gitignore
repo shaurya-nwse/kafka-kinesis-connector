@@ -4,3 +4,6 @@
 *.iws
 target
 *.yml
+.env
+jdk.Dockerfile
+!.github/**/*.yml
