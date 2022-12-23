@@ -1,6 +1,8 @@
 Kafka connector for Kinesis
 ===
 
+[![Develop](https://github.com/shaurya-nwse/kafka-kinesis-connector/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/shaurya-nwse/kafka-kinesis-connector/actions/workflows/build.yml)
+
 Kafka connector sink for AWS kinesis data streams.
 
 Inspired from / Fork of: [AWSLabs Connector](https://github.com/awslabs/kinesis-kafka-connector)
